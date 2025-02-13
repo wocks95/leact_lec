@@ -188,6 +188,44 @@
       )
   </script>
 
+  <hr/>
+
+  <!--
+    prop-types
+    1. props 객체에 저장된 속성드르이 타입 등을 명시함으로써 다른 개발자와 협업 시 개발 능률을 높일 수 있습니다.
+    2. 별도 CDN 추가가 필요합니다. (참고 : https://github.com/facebook/prop-types)
+  -->
+
+  <div id="root6"></div>
+  <script src="https://unpkg.com/prop-types@15.6/prop-types.js"></script>
+  <script type="text/babel">
+
+    function PrintComp({name, age, hobbies}) {
+      return (
+        <div>
+          <h1>My name is {name}</h1>
+          <h1>I'm {age} years old.</h1>
+          <h1>I like {hobbies[0]} and {hobbies[1]}</h1>
+        </div>    
+      )
+    }
+
+    PrintComp.prototypes = {
+      name: ProTypes.string,
+      age: ProTypes.number.isRequired,
+      hobbies: ProTypes.array
+    }
+
+    ReactDOM.createRoot(document.getElementById('root6')).render(
+      [
+        <PrintComp name="Alice" age={20} hobbies={['Swimming', 'Running']}/>,
+        <PrintComp name={10} age={'Tom'} hobbies={'Basketball'}/> // 총 3개의 Warning 발생 (Console 탭에서 확인 가능합니다.)
+      ]
+    )
+
+  </script>
+
+
 
 </body>
 </html>
