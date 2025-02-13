@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <title>Document</title>
+</head>
+<body>
+  
+  <div id="root"></div>
+
+  <script>
+     /*
+      Element
+      1. React 앱의 가장 작은 단위입니다.
+      2. 화면에 표시할 내용을 기술합니다.
+      3. React.createElement() 또는 JSX 를 이용해서 작성합니다.
+         React.createElement()는 직관적이지 않아 사용하기 불편하기 때문에 JSX 라는 새로운 문법이 나중에 제시되었습니다.
+      4. React 의 Elemnet 는 불변 객체(Immutable Object)입니다. 엘리멘트 생성 이후에는 해당 엘리멘트의 속성 또는 자식의 변경이 불가능합니다.
+     */ 
+
+    const h1Element = React.createElement(
+      'h1',
+      {
+        id: 'title',
+        className: 'title' // React 는 class 속성을 className으로 부른다.
+      },
+      'hello world'
+    );
+    /*
+      Rendering
+      1. React Element 같은 구성 요소들을 화면에 그리는 작업입니다.
+      2. Root DOM Node : ReactDOM 에서 관리하는 DOM Node 입니다. React Element 들이 그려질(Rendering) 하나의 DOM Node 를 의미합니다.
+      3. ReactDOM 은 Element 와 그 자식 Element 를 이전의 Element 와 비교하고 변경된 부분만 업데이트합니다. 변경되지 않은 부분은 X 
+    */  
+    const rootDom = document.getElementById('root');
+    const root = ReactDOM.createRoot(rootDom);
+    root.render(h1Element);  // 랜더링
+  </script>
+
+  <!-- Element 의 변경된 부분만 업데이트 되는지 확인해 봅시다. -->
+  <div id="root2"></div>
+
+  <script>
+
+    const root2 = ReactDOM.createRoot(document.getElementById('root2'));
+    setInterval(clock, 1000); // 1초마다 clock 함수가 실행됩니다.
+
+    function clock() {
+      const textElement = React.createElement('h1', {}, '시계');
+      const timeELement = React.createElement('h1', {}, new Date().toLocaleTimeString());
+      root2.render([textElement, timeELement]); // 2개 이상 엘리먼트는 배열로 전달해서 Rendering 합니다.
+    }
+
+  </script>
+
+
+
+</body>
+</html>
