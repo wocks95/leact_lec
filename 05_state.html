@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <title>Document</title>
+</head>
+<body>
+  <!--
+    state
+    1. 컴포넌트 내부에서 사용하는 값을 의미합니다.
+    2. state 값을 변경하면서 사용할 수 있습니다.
+    3. 클래스 컴포넌트는 state 값을 직접 사용할 수 있습니다.
+    4. 함수 컴포넌트는 v16.8 React.userState() 훅(Hooks)을 이용해서 state 값을 사용할 수 있습니다.
+  -->
+
+  <!--
+    클래스 컴포넌트와 state
+    1. 클래스 내부 또는 생성자에서 state 를 사용할 수 있습니다.
+    2. 생성자나 메소드 내부에서는 this.state 방식으로 사용해야 합니다.
+    3. state 에 저장하는 값은 객체 리터럴 형식 {} 을 갖춰야 합니다. (객체로 저장)
+    4. setState() 메소드를 이용해서 state 값을 변경할 수 있습니다.
+    5. setState() 메소드를 호출해서 state 값을 변경하면 자동으로 render() 메소드가 다시 호출됩니다.
+
+  -->
+  <div id="root1"></div>
+  <script type="text/babel">
+
+     class SpinComp1 extends React.Component {
+      // state 초기화 하기
+      // 프로퍼티: 값
+      state = {
+        number: 0
+      }
+      
+      // 증가용 이벤트 핸들러
+      onIncreseHandler = () => {
+        const number = this.state.number
+        this.setState({
+          number: number + 1
+        })
+      }
+
+      // render() {}
+      render() {
+        const number = this.state.number;
+        return (
+          <>
+            <h1>{number}</h1>
+            <button onClick={this.onIncreseHandler}>+</button>
+            <button onClick={() => {this.setState({number: number - 1})}}>-</button>
+          </>
+        )
+      }
+    }
+    ReactDOM.createRoot(document.getElementById('root1')).render(<SpinComp1/>)
+  </script>
+  <!--
+    setState() 메소드의 동작 방식
+    1. setState() 메소드는 비동기 방식으로 백그라운드에서 동작합니다.
+    2. 하나의 이벤트에서 setState() 메소드를 여러 번 호출하더라도 state 값이 순차적으로 여러 번 사용되지 않습니다.
+  -->
+  <!--
+    prevState 
+    1. setState() 메소드를 동기 방식처럼 동작시키기 위해서는 객체 리터럴 {} 대신 함수를 전달합니다.
+    2. 콜백 함수의 첫 번째 인자는 이전 state 의 값을 가지고 있는 prevState 를 사용합니다.
+    3. 콜백 함수의 두 번째 인자는 props 객체를 사용합니다. (사용하지 않는다면 props 는 생략 가능합니다.)
+    4. 콜백 함수는 최종적으로 state 를 객체 리터럴 {} 형태로 반환합니다.
+  -->
+  <div id="root2"></div>
+  <script type="text/babel">
+    class SpinComp2 extends React.Component {
+
+      // 생성자를 이용한 state 초기화
+      constructor(props) {
+        super(props)
+        this.state = {
+          number: 0
+        }
+      }
+
+      // 2번 setState()를 호출하는 증가용 이벤트 핸들러
+      onTwiceIncreseHandler = () => {
+        // 첫 번째 setState() 호출
+        this.setState((prevState, props) => {
+          // console.log(prevState)
+          return {
+            number: prevState.number + 1
+          }
+        })
+        // 두 번째 setState() 호출
+        this.setState((prevState, props) => {
+          // console.log(prevState)
+          return {
+            number: prevState.number + 1
+          }
+        })
+      }
+
+      render() {
+        const { number } = this.state; // 객체 구조 분해 할당
+        return (
+          <> 
+            <h1 style={number === 0 ? {color: 'black'} : number > 0 ? {color: 'red'} : {color: 'blue'}}>{number}</h1>
+            <button onClick={this.onTwiceIncreseHandler}>+1+1</button>
+            <button onClick={() => {
+              this.setState(prevState => {return {number : number -1-1}})}}>-1-1</button>
+          </>
+        )
+      }  
+    }
+    ReactDOM.createRoot(document.getElementById('root2')).render(<SpinComp2/>)
+  </script>
+
+</body>
+</html>
