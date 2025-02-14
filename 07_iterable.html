@@ -174,7 +174,7 @@
  
       // 전달된 food의 id를 가진 음식을 삭제하는 함수
       function removeFood(id) {
-        setMenu(menu.filter(food => food.id !== id)); 
+        setMenu(menu.filter(food => food.id !== id)); // id 가 다르면 true 라서 있고, 같으면 false라서 삭제
       }
       //return
       return (
