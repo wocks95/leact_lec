@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <title>Document</title>
+</head>
+<body>
+  <!-- 1. 배열 요소를 이용해 여러 개의 엘리먼트 작성하기-->
+  <div id="root1"></div>
+  <script type="text/babel">
+
+    const numbers = [10, 20, 30, 40, 50];
+
+    function NumberComp1({numbers}) {
+      
+      const liItems = numbers.map(number => <li>{number}</li>)
+
+
+      return (
+        <ul>{liItems}</ul>
+      )
+    }
+    // 리액트 내부 동작 문제 :key, 값이 자주 변경되거나 값 중 하나만 바뀌었을 때 각 고유값이 있을 경우 자동저장할 때 그 고유값만 변경이 가능하여 성능면에서 좋음 
+  /*
+    실행 결과
+    이 코드를 실행하면 리스트의 각 항목에 key를 추가해야 한다는 경고가 나타납니다.
+
+    key
+    리액트에서 key는 컴포넌트 배열을 rendering 했을 때 어떤 요소에 변경이 있는지 알아내기 위해 사용하는 식별자 역할을 수행합니다.
+    key가 존재하는 경우 빠르게 어떤 요소에 변화가 일어났는지 감지할 수 있습니다.
+    또한 key를 이용해 해당 요소를 추출할 수 있습니다.
+    key로 사용하기 적절한 값은 DB에서 조회한 데이터의 PK값입니다.
+  */
+
+    ReactDOM.createRoot(document.getElementById('root1')).render(<NumberComp1 numbers={numbers}/>)
+
+  </script>
+  <hr/>
+  <!-- 2. key 속성을 등록한 여러 엘리멘트 생성하기-->
+  <div id="root2"></div>
+  <script type="text/babel">
+    const items = [10, 20, 30, 40, 50];
+    function ItemComp({items}) {
+      // 리스트의 각 항목에 key 속성을 부여하되, 중복 값을 부여하면 안 됩니다.
+      const liItems = items.map((item, index) => <li key={index}>{item}</li>)
+
+      return (
+        <ul>
+          {liItems}
+        </ul>
+      )
+    }
+    ReactDOM.createRoot(document.getElementById('root2')).render(<ItemComp items={items}/>)
+
+  </script>
+  <hr/>
+  <!-- 3. key 속성을 등록한 여러 컴포넌트 생성하기 -->
+  <div id="root3"></div>
+  <script type="text/babel">
+
+    // <li> 엘리멘트를 반환하는 LiComp 컴포넌트
+    function LiComp({name}) {
+      return <li>{name}</li>
+    }
+
+    // LiComp 컴포넌트를 여러 개 생성하는 UlComp 컴포넌트
+    function UlComp({names}) {
+      return (
+        <ul>
+          { names.map((name, index) => <LiComp key={index} name={name}/>)}
+
+        </ul>
+      )
+    }
+
+    // UlComp 컴포넌트에 배열 전달하기 (LiComp 컴포넌트 제작에 필요한 배열)
+    const names = ['alice', 'john', 'tommy', 'jessica', 'ralph'];
+    ReactDOM.createRoot(document.getElementById('root3')).render(<UlComp names={names}/>)
+
+  </script>
+  <hr/>
+
+  <div id="root4"></div>
+  <script type="text/babel">
+    function JobComp() {
+      // state를 객체 배열로 생성
+      const {useState} = React;
+      const [jobs, setJobs] = useState([
+        {id: 1, job: '개발자'},
+        {id: 2, job: '변호사'}
+      ]);
+  
+      // id가 사용하는 state
+      const [ id, setId ] = useState(jobs.length + 1); // 새로 등록할 id의 초기값은 3입니다.
+  
+      // job이 사용하는 state
+      const [jobname, setJobname] =useState('');
+  
+      // 입력된 직업이 state job 에 저장되는 이벤트 핸들러
+      const onChangeHandler = (e) => {
+        setJobname(e.target.value)
+      }
+
+      // Add 버튼을 클릭하면 동작하는 이벤트 핸들러
+      const onClickHandler = () => {
+          const newJob =  {
+            id: id, // state id 의 초기값
+            job: jobname
+          
+        }
+        // 새로운 jobs 등록 후 다음에 등록할 job의 id와 job 초기화
+       setJobs(jobs.concat(newJob)); // state에 추가할려면 set이 필요함
+       setId(id + 1); // 추가 이후 다시 초기화
+       setJobname('');
+      }
+
+      // 전달된 job의 id를 가진 직업을 삭제하는 함수
+      function removeJob(id) {
+        setJobs( jobs.filter(job => job.id !== id)); // setJobs( jobs.filter(job => {return job.id !== id }));
+      }
+
+      //return
+      return (
+        <>
+          <input type="text" placeholder="직업 입력" value={jobname} onChange={onChangeHandler}/>
+          <button type="button" onClick={onClickHandler}>Add</button>
+          <ul>
+            {jobs.map(job => <li key={job.id} onDoubleClick={() => {removeJob(job.id)}}>{job.job}</li>)}
+          </ul>
+        </>
+      )
+
+    }
+
+    ReactDOM.createRoot(document.getElementById('root4')).render(<JobComp/>)
+  </script>
+
+  <hr/>
+  <div id="root5">연습</div>
+  <script type="text/babel">
+    function FoodComp() {
+      //state
+      const {useState} = React;
+      const [ menu, setMenu ] = useState([
+        {id: 1, food: '라면'},
+        {id: 2, food: '김밥'}
+      ]);
+  
+      // id가 사용하는 state
+      const [ id, setId ] = useState(menu.length + 1); 
+  
+      // food가 사용하는 state
+      const [ foodname, setFoodname ] = useState('');
+      
+      // 입력된 직업이 state menu 에 저장되는 이벤트 핸들러
+      const onChangeHandler = (e) => {
+        setFoodname(e.target.value);
+      }
+      // Add 버튼을 클릭하면 동작하는 이벤트 핸들러
+      const onClickHandler = () => {
+        const newFood = {
+          id: id,
+          food: foodname
+        }
+        // 새로운 food 등록 후 다음에 등록할 menu의 id와 food 초기화
+        setMenu(menu.concat(newFood));
+        setId(id + 1)
+        setFoodname('');
+      }
+ 
+      // 전달된 food의 id를 가진 음식을 삭제하는 함수
+      function removeFood(id) {
+        setMenu(menu.filter(food => food.id !== id)); 
+      }
+      //return
+      return (
+        <>
+          <input type="text" placeholder="음식 입력" value={foodname} onChange={onChangeHandler}/>
+          <button type="button" onClick={onClickHandler}>추가</button>
+          <ul>
+            {menu.map(food => <li key={food.id} onDoubleClick={() => {removeFood(food.id)}}>{food.food}</li>)}
+          </ul>
+        </>
+      )
+    }
+    ReactDOM.createRoot(document.getElementById('root5')).render(<FoodComp/>)
+
+
+
+  </script>
+
+
+
+
+</body>
+</html>
