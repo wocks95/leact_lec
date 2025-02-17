@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <title>Document</title>
+</head>
+<body>
+
+<!--
+  Life Cycle
+  
+  1. 컴포넌트를 이용해 엘리먼트가 화면에 나타나거나, 업데이트 되거나, 삭제될 때 호출되는 메소드를 의미합니다.
+  2. 클래스 컴포넌트에서만 호출할 수 있습니다.
+  3. 크게 3가지로 분류할 수 있습니다.
+    1) Mount   : 엘리먼트가 화면에 나타나는 것을 의미합니다.
+    2) Update  : 엘리먼트가 수정되어 화면이 다시 그려지는 것을 의미합니다.
+    3) Unmount : 엘리먼트가 화면에서 사라지는 것을 의미합니다.
+-->
+
+<!--
+  Mount
+  1. 엘리먼트가 화면에 나타나는 것을 의미합니다.
+  2. Life Cycle Method
+    1) constructor
+    2) getDerivedStateFromProps
+    3) render
+    4) componentDidMount
+-->
+<div id="root1"></div>
+<script type="text/babel">
+
+  class MountComp1 extends React.Component {
+    // 1. constructor
+    //    constructor에서 state를 초기화 해야 getDerivedStateFromProps 메소드를 사용할 수 있습니다.
+    constructor(props) {
+      super(props);
+      this.state = {
+        text: ''
+      }
+      console.log('constructor');
+    }  
+    // 2. getDerivedStateFromProps
+    //   props로 받아온 값을 state와 동기화할 때 사용합니다.Mount, Update 시 동작합니다.
+    static getDerivedStateFromProps(nextProps, nextState) {
+      console.log('getDerivedStateFromProps');
+      return null;  // state 변경이 없는 경우에 null을 반환합니다.
+    }
+    // 3. render
+    //   this.props, this.state, this.setState()를 사용할 수 있습니다.
+    render() {
+      console.log('render');
+
+      return (
+        <h1>Mount Rendering</h1>
+      )
+    }
+
+    // 4. componentDidMount
+    //   렌더링 이후에 호출되는 메소드입니다.
+    //   대표적으로 비동기 처리를 수행할 수 있습니다. 
+    componentDidMount() {
+      console.log('componentDidMount');
+    }
+  }
+  // ReactDOM.createRoot(document.getElementById('root1')).render(<MountComp1/>)
+</script>
+
+<!--
+  Update(리렌더링)
+  1. 컴포넌트의 상태가 변경되는 상황을 의미합니다.
+  2. 4가지 상황이 있습니다.
+    1) props 변경
+    2) state 변경
+    3) 부모 컴포넌트의 리렌더링
+    4) 강제 렌더링 : this.forceUpdqte() 메소드
+  3. Life Cycle Method
+    1) constructor
+    2) getDerivedStateFromProps
+    3) shouldComponentUpdate
+    4) render
+    5) getSnapshotBeforeUpdate
+    6) componentDidUpdate
+-->
+<div id="root2"></div>
+<script type="text/babel">
+
+  class UpdateComp extends React.Component {
+    
+    // 1.constructor
+    constructor(props) {
+      super(props);
+      this.state = {
+        now: new Date().toLocaleTimeString()
+      }
+      console.log('constructor:', this.state.now);
+    }
+
+    // 2. getDerivedStateFromProps
+    static getDerivedStateFromProps(nextProps, nextState) {
+      console.log('getDerivedStateFromProps nextProps:', nextProps);
+      console.log('getDerivedStateFromProps nextState:', nextState);
+      return null;
+    }
+
+    // 3. shouldComponentUpdate
+    // 컴포넌트를 리렌더릴 할 것인지 여부를 결정합니다.
+    // booleam 타입의 값을 반환합니다.
+    // false를 반환하면 render() 메소드 이후(포함) Life Cycle Method 호출을 하지 않습니다.
+    shouldComponentUpdate(nextProps, nextState) {
+      console.log('shouldComponentUpdate nextProps:', nextProps);
+      console.log('shouldComponentUpdate nextState:', nextState);
+      return true;
+    }
+
+    
+    onClickHandler = () => {
+      this.setState({ // 클래스 컴포넌트에서 state 변경하는 setState() 메소드
+        now: new Date().toLocaleDateString()
+      }); 
+    }
+    // 4. render
+    render() {
+      console.log('render');
+      return (
+      <>
+        <h1>Update Rendering</h1>
+        <button onClick={this.onClickHandler}>Now</button>
+        <h1>{this.state.now}</h1>
+      </>
+      )
+    }
+    // 5. getSnapshotBeforeUpdate
+    // 컴포넌트의 업데이트 직전에 호출하는 메소드입니다.
+    // 주로 업데이트 직전의 값을 참고할 일이 있을 때(대표적으로 스크롤바의 위치 등) 사용합니다.
+    // 반환값을 componentDidUpdate() 메소드의 3번째 인자로 전달합니다. (1번째 인자는 prevProps, 2번째 인자는 prevState)
+    getSnapshotBeforeUpdate(prevProps, prevState) {
+      console.log('getSnapshotBeforeUpdate prevProps:', prevProps);
+      console.log('getSnapshotBeforeUpdate prevState:', prevState);
+      return { //componentDidUpdate() 메소드로 전달
+        snapshotTime: new Date().toLocaleDateString()
+      }
+    }
+    // 6. componentDidUpdate
+    //   컴포넌트의 리렌더링 이후에 동작하는 메소드입니다.
+    //   컴포넌트가 리렌더링 이전에 가졌던 데이터를 prevProps, prevState를 이용해 접근할 수 있습니다.
+    componentDidUpdate(prevProps, prevState, snapshot) {
+      console.log('componentDidUpdate prevProps:', prevProps);
+      console.log('componentDidUpdate prevState:', prevState);
+      console.log('componentDidUpdate snapshot:', snapshot);
+    }
+
+  }
+  //ReactDOM.createRoot(document.getElementById('root2')).render(<UpdateComp/>)
+
+
+</script>
+
+
+
+<!--
+  Unmount
+  1. 컴포넌트를 화면에서 제거하는 것을 의미합니다.
+  2. Life Cycle Method
+    1) componentWillUnmount
+-->
+<div id="root3"></div>
+<script type="text/babel">
+  class UnmountComp extends React.Component {
+
+    // 1. render
+    render() {
+      return <h1>Unmount Rendering</h1>
+    }
+
+    // 2. componentWillUnmount
+    // 컴포넌트가 화면에서 사라지기 직전에 호출됩니다.
+    componentWillUnmount() {
+      console.log('componentWillUnmount');
+    }
+  }
+const root3 = ReactDOM.createRoot(document.getElementById('root3'));
+root3.render(<UnmountComp/>);
+setTimeout(() => {
+  root3.render(null);
+}, 3000); // 3초 후에 Unmount 
+</script>
+
+
+
+</body>
+</html>
