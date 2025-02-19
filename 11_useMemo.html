@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <title>Document</title>
+</head>
+<body>
+
+<div id="root1"></div>
+<script type="text/babel">
+
+  const operation1 = (n) => {
+    return n + 1;
+  }
+
+  const operation2 = (n) => {
+    for(let i = 0; i < 1999999999; i++);
+    return n + 1;
+  }
+
+  function UseMemoComp1() {
+
+    const { useState } = React;
+
+    const [normalNumber, setNormalNumber] = useState(0);
+    const [overheadNumber, setOverHeadNumber] = useState(0);
+
+    const normalResult = operation1(normalNumber);
+    const overheadResult = operation2(overheadNumber);
+
+    return (
+      <>
+        <h1>정상 계산 활용</h1>
+        <input type="number" value={normalNumber} onChange={e => setNormalNumber(Number(e.target.value))}/>
+        <div>{normalNumber} + 1 = {normalResult}</div>
+        <h1>오버헤드 계산 활용</h1>
+        <input type="number" value={overheadNumber} onChange={e => setOverHeadNumber(Number(e.target.value))}/>
+        <div>{overheadNumber} + 1 = {overheadResult}</div>
+      </>
+    )
+  }
+  //ReactDOM.createRoot(document.getElementById('root1')).render(<UseMemoComp1/>);
+</script>
+
+<div id="root2"></div>
+<script type="text/babel">
+
+  const normalOperation = (n) => {
+    return n + 1;
+  }
+
+  const overheadOperation = (n) => {
+    for(let i = 0; i < 1999999999; i++); // 불필요한 반목문을 추가하여 실행 시간이 길어지도록 만든 함수, 특정 값이 변경될 때마다 다시 실행되면 성능 저하를 초래함
+    return n + 1;
+  }
+
+  function UseMemoComp2() {
+    // useMemo : 성능 최적화를 위해 사용되며, 값이 변경되지 않으면 캐시된 결과를 반환하여 불필요한 연산을 방지합니다.
+    const { useState, useMemo } = React;
+
+    const [normalNumber, setNormalNumber] = useState(0);
+    const [overheadNumber, setOverHeadNumber] = useState(0);
+
+    // useMemo를 활용한 캐싱
+    // normalNumber 값이 변경될 때만 normalOperation을 다시 실행
+    const normalCachedResult = useMemo(() => {  
+      return normalOperation(normalNumber);
+    }, [normalNumber]);
+
+    const overheadCachedResult = useMemo(() => {
+      return overheadOperation(overheadNumber);
+    }, [overheadNumber]);
+
+    return (
+      <>
+        <h1>정상 계산 활용</h1>
+        <input type="number" value={normalNumber} onChange={e => setNormalNumber(Number(e.target.value))}/>
+        <div>{normalNumber} + 1 = {normalCachedResult}</div>
+        <h1>오버헤드 계산 활용</h1>
+        <input type="number" value={overheadNumber} onChange={e => setOverHeadNumber(Number(e.target.value))}/>
+        <div>{overheadNumber} + 1 = {overheadCachedResult}</div>
+      </>
+    )
+  }
+ ReactDOM.createRoot(document.getElementById('root2')).render(<UseMemoComp2/>);
+</script>
+
+
+</body>
+</html>
