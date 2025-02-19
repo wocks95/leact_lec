@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <title>Document</title>
+</head>
+<body>
+  <div id="root1"></div>
+  <script type="text/babel">
+    
+    
+    function UseRefComp1() {
+      const {useState, useRef, useEffect } = React;
+
+      const [ number,setNumber ] = useState(0);
+
+      const refNumber = useRef(0);
+
+      return (
+        <>
+          <button onClick={() => { setNumber(number + 1)}}>number</button>
+          <button onClick={() => { refNumber.current += 1 }}>refNumber 증가</button>
+          
+          <div>number : {number}</div>
+          <div>refNumber : {refNumber.current}</div>
+        </>
+      )
+    }
+   // ReactDOM.createRoot(document.getElementById('root1')).render(<UseRefComp1/>)
+  </script>
+
+  <!-- useRef와 useEffect를 활용하여 입력 필드에 자동 포커스를 주는 기능을 구현함-->
+  <div id="root2"></div>
+  <script type="text/babel">
+
+    function UseRefComp2() {
+      const { useState, useRef, useEffect } = React;
+
+      const [ text,setText ] = useState('');
+      
+      const inputRef = useRef();
+
+      useEffect(() => {
+        inputRef.current.focus();
+      }, []) // 의존성 배열이 비어 있으므로, 컴포넌트가 처음 렌더링될 때만 실행됨
+
+      const onClickHandler = (e) => {
+        alert(`${text}`);
+        setText(''); // 입력 필드의 값을 지움
+        inputRef.current.focus(); // 입력 필드에 포커스를 다시 맞춰서, 버튼 클릭 후에도 바로 입력 가능
+      }
+      return (
+        <>
+          <input type="text" value={text} ref={inputRef} onChange={(e) => setText(e.target.value)} />
+          <button onClick={onClickHandler}>클릭</button>
+        </>
+      )
+      //  value={text} → text 상태와 연결됨
+    }
+    ReactDOM.createRoot(document.getElementById('root2')).render(<UseRefComp2/>)
+  </script>
+
+
+
+
+
+</body>
+</html>
