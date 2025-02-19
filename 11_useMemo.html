@@ -9,14 +9,38 @@
   <title>Document</title>
 </head>
 <body>
+<!--
+  React.useMemo()
+  
+  1. 리렌더링 할 때 계산 결과를 캐싱해 두는 훅(Hooks)입니다.
+  2. 계산이 오래 걸리는 경우 해당 계산 결과를 캐싱해 두면 리렌더링할 때 재계산을 생략할 수 있습니다.
+  3. 반환할 계산 결과를 캐싱해 두는 것을 Memoization(메모제이션)이라고 합니다.
+  4. 형식
+    cachedValue = React.useMemo(calculateValue, dependencies)
+    1) 반환
+      (1) 초기 렌더링 시 calculateValue 함수를 호출한 결과를 반환합니다.
+      (2) 리렌더링 시 의존성 배열(dependencies)에 변경이 없으면 캐싱한 값을 반환하고, 변경이 있으면 calculateValue 함수를 다시 호출해 반환
+    2) 매개변수
+      (1) calculateValue
+        - 계산이 오래 걸리는 연산을 수행하는 함수입니다.
+        - 인자는 없고, 연산 결과를 반환합니다. 모든 타입의 값을 반환할 수 있습니다.
+      (2) dependencies
+        - 의존성 배열입니다.
+        - calculateValue 함수에서 사용하는 모든 반응형 값(props, state, 변수, 함수 등)이 포함될 수 있습니다.
+        - dependencies가 비어 있는 배열인 경우: 마지막 렌더링에서 캐싱한 값을 반환합니다.
+        - dependencies가 값을 가진 배열인 경우: calculateValue 함수를 다시 호출하고 반환된 값을 캐싱합니다.  
+-->
 
+<!-- 1.리렌더링 시 불필요하게 오버헤드가 걸리는 상황 -->
 <div id="root1"></div>
 <script type="text/babel">
 
+  // 일반 연산
   const operation1 = (n) => {
     return n + 1;
   }
 
+  // 오버헤드 연산
   const operation2 = (n) => {
     for(let i = 0; i < 1999999999; i++);
     return n + 1;
@@ -26,9 +50,11 @@
 
     const { useState } = React;
 
+    // 리렌더링 시 일반 연산을 수행합니다. 성능에 별다른 영향이 없습니다.
     const [normalNumber, setNormalNumber] = useState(0);
     const [overheadNumber, setOverHeadNumber] = useState(0);
 
+    // 리렌더링 시 오버헤드가 걸리는 연산을 수행합니다. 성능에 지대한 영향을 끼칩니다.
     const normalResult = operation1(normalNumber);
     const overheadResult = operation2(overheadNumber);
 
@@ -46,13 +72,15 @@
   //ReactDOM.createRoot(document.getElementById('root1')).render(<UseMemoComp1/>);
 </script>
 
+  <!-- 2. useMemo()를 이용해 리렌더링 시 불필요한 연산을 피할 수 있습니다. -->
 <div id="root2"></div>
 <script type="text/babel">
 
+  // 일반 연산
   const normalOperation = (n) => {
     return n + 1;
   }
-
+  // 오버헤드 연산
   const overheadOperation = (n) => {
     for(let i = 0; i < 1999999999; i++); // 불필요한 반목문을 추가하여 실행 시간이 길어지도록 만든 함수, 특정 값이 변경될 때마다 다시 실행되면 성능 저하를 초래함
     return n + 1;
@@ -62,9 +90,11 @@
     // useMemo : 성능 최적화를 위해 사용되며, 값이 변경되지 않으면 캐시된 결과를 반환하여 불필요한 연산을 방지합니다.
     const { useState, useMemo } = React;
 
+    // 일반 연산은 useMemo()를 사용할 필요가 없습니다. useMemo()는 오래 걸리는 연산에서 사용합니다.
     const [normalNumber, setNormalNumber] = useState(0);
     const [overheadNumber, setOverHeadNumber] = useState(0);
 
+    // 오버헤드 연산은 useMemo()를 사용해서 연산 결과를 캐싱해 둘 수 있습니다.
     // useMemo를 활용한 캐싱
     // normalNumber 값이 변경될 때만 normalOperation을 다시 실행
     const normalCachedResult = useMemo(() => {  
@@ -73,7 +103,7 @@
 
     const overheadCachedResult = useMemo(() => {
       return overheadOperation(overheadNumber);
-    }, [overheadNumber]);
+    }, [overheadNumber]); // overheadNumber가 변하면 다시 연산을 수행합니다.
 
     return (
       <>
@@ -86,9 +116,64 @@
       </>
     )
   }
- ReactDOM.createRoot(document.getElementById('root2')).render(<UseMemoComp2/>);
+ //ReactDOM.createRoot(document.getElementById('root2')).render(<UseMemoComp2/>);
 </script>
 
+<!--
+   3. object type 
+   useEffect()의 의존성 배열에 컴포넌트에서 선언한 객체를 전달하는 경우
+   해당 객체는 useMemo()를 이용해 캐싱해야 합니다.
+   그렇지 않으면 객체가 가진 값의 변경이 없더라도 항상 useEffect()이 동작하는 문제가 발생합니다.
+-->
+<div id="root3"></div>
+<script type="text/babel">
+
+  function UseMemoComp3() {
+    const { useState, useEffect, useMemo } = React;
+
+    // 객체와 상관 없는 state 변수
+    const [ number, setNumber ] = useState(0);
+
+    // 객체 tv에서 사용하는 state 변수
+    const [ isOn, setIsOn ] = useState(false);
+
+    // 컴포넌트 내부에서 선언한 지역변수 객체 tv는 리렌더링 시 항상 재할당됩니다. (객체값은 그대로이지만 객체 주소가 바뀝니다.)
+    // 이 객체 tv를 useEffect의 의존성 배열에 전달하면 객체 tv가 변하지 않더라도 useEffect은 변한 것으로 생각합니다.
+    // 이 문제를 해결하기 위해서 useMemo()로 객체 tv를 반환해서 객체 tv 값을 캐싱해 둡니다.
+    /*
+    const tv = {
+      brand: 'LG',
+      size: 75,
+      power: isOn ? 'ON' : 'OFF',
+    }
+    */
+
+    // useMemo()를 이용해 캐싱한 객체 tv
+    const tv = useMemo(() => {
+      return {
+        brand: 'LG',
+        size: 75,
+        power: isOn ? 'ON' : 'OFF',
+      }
+    }, [isOn]); // isOn 값이 변하면 객체 tv를 다시 생성해서 반환합니다.
+
+    useEffect(() => {
+      console.log('useEffect');
+    }, [tv]); // 객체 tv가 변하면 리렌더링 후 useEffect이 동작합니다.
+    
+    return (
+      <>
+        {/* state.number 변경 */}
+        <input type="number" value={number} onChange={e => setNumber(Number(e.target.value))}/>
+        <br/>
+        {/* state.isOn 변경 */}
+        <button onClick={() => { setIsOn(!isOn) }}>TV전원버튼</button>
+      </>
+    )
+  }
+  ReactDOM.createRoot(document.getElementById('root3')).render(<UseMemoComp3/>);
+
+</script>
 
 </body>
 </html>

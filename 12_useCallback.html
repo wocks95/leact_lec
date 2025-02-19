@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <title>Document</title>
+</head>
+<body>
+  <div id="root1"></div>
+  <script type="text/babel">
+    function UseCallbackComp1() {
+      const { useState, useEffect } = React;
+
+      const [ number, setNumber ] = useState(0);
+
+      const print = () => {
+        console.log(number); // 내용이 바뀌지 않더라도 리렌더링할 때마다 참조주소가 바뀌는걸로 인식 됨
+      }
+
+      useEffect(() => {
+        console.log('useEffect');
+      }, [print]); // print 함수가 변경되면 리렌더링 시 useEffect()이 동작합니다.
+
+      const [ text, setText ] = useState('');
+
+      return (
+        <>
+          <input type="number" value={number} onChange={e => setNumber(Number(e.target.value))}/>
+          <button onClick={print}>print 함수 호출</button>
+          <br/>
+          <input type="text" value={text} onChange={e => setText(e.target.value)}/>
+        </>
+      )
+
+    }
+    ReactDOM.createRoot(document.getElementById('root1')).render(<UseCallbackComp1/>);
+  </script>
+
+  <div id="root2"></div>
+  <script type="text/babel">
+    function UseCallbackComp2() {
+      const { useState, useEffect, useCallback } = React;
+
+      const [ number, setNumber ] = useState(0);
+
+      const print = useCallback(() => {
+        console.log(number);
+      }, [number]); // number가 변하면 useCallback()이 가지고 있는 함수를 반환합니다. 즉 내용이 변하지 않으면 재할당x
+
+      useEffect(() => {
+        console.log('useEffect');
+      }, [print]); // print 함수가 변경되면 리렌더링 시 useEffect()이 동작합니다.
+
+      const [ text, setText ] = useState('');
+
+      return (
+        <>
+          <input type="number" value={number} onChange={e => setNumber(Number(e.target.value))}/>
+          <button onClick={print}>print 함수 호출(Callback)</button>
+          <br/>
+          <input type="text" value={text} onChange={e => setText(e.target.value)}/>
+        </>
+      )
+
+    }
+    ReactDOM.createRoot(document.getElementById('root2')).render(<UseCallbackComp2/>);
+  </script>
+</body>
+</html>
