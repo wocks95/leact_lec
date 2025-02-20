@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <title>Document</title>
+</head>
+<body>
+
+<!-- 1. props drilling : 최상위 컴포넌트부터 아래 컴포넌트로 props를 계속 전달하는 것을 의미합니다. -->
+<div id="root1"></div>
+<script type="text/babel">
+
+  function Header1({dark}) {
+    return (
+      <div style={{
+        backgroundColor: dark ? 'black' : 'white',
+        color: dark ? 'white' : 'black',
+      }}>
+        <h1>Welcome</h1>
+      </div>
+    )
+  }
+
+  function Body1({ dark, setDark }) {
+    return (
+      <div style= {{
+        backgroundColor: dark ? 'darkgray' : 'white',
+        color: dark ? 'white' : 'black',
+      }}>
+        <p>본문</p>
+        <button onClick={() => { setDark(!dark) }}>{dark ? 'Light' : 'Dark'}</button>
+      </div>
+    )
+  }
+
+  function Footer1({dark}) {
+    return (
+      <div style={{
+        backgroundColor: dark ? 'black' : 'white',
+        color: dark ? 'white' : 'black',
+      }}>
+        <p>Copyright. All rights reserved.</p>
+      </div>
+    )
+  }
+
+  function Layout1({ dark, setDark }) {
+    return (
+      <div className="container">
+        <Header1 dark={dark}/>
+        <Body1 dark={dark} setDark={setDark}/>
+        <Footer1 dark={dark}/>
+      </div>
+    )
+  }
+
+  function App1() {
+
+    const { useState } = React;
+    const [dark, setDark] = useState(false);
+
+    return (
+      <Layout1 dark={dark} setDark={setDark}/>
+
+    )
+  } 
+  ReactDOM.createRoot(document.getElementById('root1')).render(<App1/>);
+
+</script>
+
+<div id="root2"></div>
+<script type="text/babel">
+
+  // 1. useContext() 사용을 위해 Context 생성하기
+  const DarkThemeContext = React.createContext(null);
+
+  function Header2() {
+    // 4. useContext()를 이용하여 DarkThemeContext에서 필요한 정보를 확인합니다.
+    const { useContext } = React;
+    const darkThemeContext = useContext(DarkThemeContext);
+    const { dark } = darkThemeContext;
+
+    return (
+      <div style={{
+        backgroundColor: dark ? 'black' : 'white',
+        color: dark ? 'white' : 'black',
+      }}>
+        <h1>Welcome</h1>
+      </div>
+    )
+  }
+
+  function Body2() {
+    // 4. useContext()를 이용하여 DarkThemeContext에서 필요한 정보를 확인합니다.
+    const { useContext } = React;
+    const darkThemeContext = useContext(DarkThemeContext);
+    const { dark, setDark } = darkThemeContext;
+    return (
+      <div style= {{
+        backgroundColor: dark ? 'darkgray' : 'white',
+        color: dark ? 'white' : 'black',
+      }}>
+        <p>본문</p>
+        <button onClick={() => { setDark(!dark) }}>{dark ? 'Light' : 'Dark'}</button>
+      </div>
+    )
+  }
+
+  function Footer2() {
+    // 4. useContext()를 이용하여 DarkThemeContext에서 필요한 정보를 확인합니다.
+    const { useContext} = React;
+    const darkThemeConatext = React.useContext(DarkThemeContext);
+    const { dark } = darkThemeConatext;
+    return (
+      <div style={{
+        backgroundColor: dark ? 'black' : 'white',
+        color: dark ? 'white' : 'black',
+      }}>
+        <p>Copyright. All rights reserved.</p>
+      </div>
+    )
+  }
+
+  function Layout2() {
+    // Layout2 컴포넌트가 포함하고 있는 Header2, Body2, Footer2 컴포넌트는 모두 DarkThemeContext를 구독할 수 있습니다.
+    return (
+      <div className="container">
+        <Header2 />
+        <Body2 />
+        <Footer2 />
+      </div>
+    )
+  }
+
+  function App2() {
+
+    const { useState } = React;
+    const [dark, setDark] = useState(false);
+
+    // 2. DarkThemeContext 제공자에게 dark, setDark를 전달하고 Layout2 컴포넌트가 이를 구독할 수 있도록 합니다.
+    return (
+      <DarkThemeContext.Provider value={{dark, setDark}}>
+        <Layout2/>
+      </DarkThemeContext.Provider>
+
+    )
+  } 
+  ReactDOM.createRoot(document.getElementById('root2')).render(<App2/>);
+
+</script>
+
+</body>
+</html>

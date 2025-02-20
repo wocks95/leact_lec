@@ -56,9 +56,10 @@
       }, [print]); // print 함수가 변경되면 리렌더링 시 useEffect()이 동작합니다.
 
       // 리렌더링을 유발할 state number
-      // print
+      // print 함수와 관련 없음
       const [ text, setText ] = useState('');
 
+      // 
       return (
         <>
           <input type="number" value={number} onChange={e => setNumber(Number(e.target.value))}/>
