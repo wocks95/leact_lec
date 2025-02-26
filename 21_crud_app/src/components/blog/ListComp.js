@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { getBlogList } from '../../api/blogAPI';
-import blogCustomNavigate from '../../hooks/blogCustomNavigate';
+import CustomNavigate from '../../hooks/CustomNavigate';
 
 const ListComp = () => {
 
-  const { goToDetailPage } = blogCustomNavigate();
+  const { goToDetailPage } = CustomNavigate();
 
   const [ serverData, setServerData ] = useState({
     status: 0,
@@ -15,11 +15,13 @@ const ListComp = () => {
     }
   })
 
+  // useSearchParams() : Query String(쿼리 스트링)으로 전달되는 요청 파라미터 처리
   const [queryParams] = useSearchParams();
-  const page =  !queryParams.get('page') ? 1 : parseInt(queryParams.get('page'));
-  const size =  !queryParams.get('size') ? 10 : parseInt(queryParams.get('size'));
-  const sort =  !queryParams.get('sort') ? 'id,desc' : queryParams.get('sort');
+  const page =  !queryParams.get('page') ? 1 : parseInt(queryParams.get('page'));   // 요청 파라미터 page가 없으면 page=1
+  const size =  !queryParams.get('size') ? 10 : parseInt(queryParams.get('size'));  // 요청 파라미터 size가 없으면 size=2
+  const sort =  !queryParams.get('sort') ? 'id,desc' : queryParams.get('sort');     // 요청 파라미터 sort가 없으면 sort=id
 
+  // useEffect() : 최초 렌더링 시 또는 page/size/sort 중 하나가 변하면 블로그 목록 조회
   useEffect(() => {
     getBlogList({ page, size, sort })
       .then(jsonData => {
