@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { getBlogList } from '../../api/blogAPI';
+import blogCustomNavigate from '../../hooks/blogCustomNavigate';
 
 const ListComp = () => {
+
+  const { goToDetailPage } = blogCustomNavigate();
 
   const [ serverData, setServerData ] = useState({
     status: 0,
@@ -18,21 +21,14 @@ const ListComp = () => {
   const sort =  !queryParams.get('sort') ? 'id,desc' : queryParams.get('sort');
 
   useEffect(() => {
-    const getBlogList = async () => {
-      const response = await axios({
-        url: 'http://localhost:8080/blogs',
-        method: 'get',
-        params: {
-          page: page,
-          size: size,
-          sort: sort,
-        }
-      });
-      const jsonData = await response.data;
-      setServerData(jsonData);
-    }
-    getBlogList();
+    getBlogList({ page, size, sort })
+      .then(jsonData => {
+        console.log(jsonData);
+        setServerData(jsonData);   
+      }) 
   }, [page, size, sort]); // page, size, sort 가 변경되면 리렌더링합니다.
+
+
 
   return (
     <div>
@@ -47,8 +43,10 @@ const ListComp = () => {
           {
             serverData.results.blogList.map(blog =>
               <tr key={blog.id}>
-                <td>{blog.title}</td>
-                <td>{blog.createDt}</td>
+                <td>
+                  <span onClick={() => { goToDetailPage(blog.id) }}>{blog.title}</span>
+                </td>
+                <td>{blog.createDt.replace('T', ' ')}</td>
               </tr>
             )
           }

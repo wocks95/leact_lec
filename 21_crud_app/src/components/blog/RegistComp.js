@@ -31,7 +31,7 @@ const RegistComp = () => {
     alert(jsonData.message);
     setBlog(initalBlog);
     navigate({
-      pathname: '/blog/list',
+      pathname: '/blog/list', // 목록 보기로 이동
     })
   }
 

@@ -44,7 +44,7 @@
 5. 수업을 위한 패키지 설치
   1) npm install -g npx            : 글로벌 패키지에 npx 설치 (생략 가능)
   2) npm install -g rimraf         : 빠른 삭제를 지원하는 패키지 (npx 이용해 삭제 시 생략 가능)
-  3) npm install react-route-dom@6 : 리액트 라우터 기능 (필수)
+  3) npm install react-router-dom@6 : 리액트 라우터 기능 (필수)
   4) npm install axios             : axios (Fetch API 사용 시 생략 가능)
 
 6. 리액트 프로젝트 생성 및 실행
