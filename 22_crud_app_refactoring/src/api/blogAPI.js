@@ -3,7 +3,7 @@ import axios from 'axios';
 const API_HOST ='http://localhost:8080';
 const  REQUEST_URL = `${API_HOST}/blogs`;
 
-export const getBlogList = async (parameters) => {
+export const getBlogList = async (parameters) => {  // 백엔드의 pageable로 보내지는 중 (page, size, sort)
   const response = await axios.get(`${REQUEST_URL}`, {
     params:  parameters,
   });

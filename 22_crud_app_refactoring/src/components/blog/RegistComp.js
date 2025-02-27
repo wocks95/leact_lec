@@ -13,6 +13,7 @@ const RegistComp = () => {
     content: '',
   });
 
+  // onChangeHandler(): 사용자가 title, content에 입력한 내용을 blog 객체에 저장
   const onChangeHandler = e => {
     setBlog({
       ...blog,
